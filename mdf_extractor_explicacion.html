@@ -1,0 +1,462 @@
+
+<style>
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.5rem; padding: 1rem 0 0; }
+  .nav-btn {
+    font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-secondary);
+    transition: all 0.15s;
+  }
+  .nav-btn.active {
+    background: var(--color-background-info);
+    color: var(--color-text-info);
+    border-color: transparent;
+    font-weight: 500;
+  }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 500; color: var(--color-text-secondary);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;
+  }
+  .card-body { font-size: 14px; line-height: 1.7; color: var(--color-text-primary); }
+  pre {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+  }
+  .tag {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: 20px; font-family: var(--font-mono); font-weight: 500;
+    margin: 2px;
+  }
+  .tag-blue { background: #E6F1FB; color: #0C447C; }
+  .tag-teal { background: #E1F5EE; color: #085041; }
+  .tag-amber { background: #FAEEDA; color: #633806; }
+  .tag-coral { background: #FAECE7; color: #712B13; }
+  .tag-purple { background: #EEEDFE; color: #3C3489; }
+  .tag-gray { background: #F1EFE8; color: #444441; }
+  .fn-card {
+    border-left: 2px solid #378ADD;
+    border-radius: 0;
+    background: var(--color-background-secondary);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .fn-name { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: #0C447C; margin-bottom: 4px; }
+  .fn-desc { font-size: 13px; line-height: 1.6; color: var(--color-text-secondary); }
+  .step {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    min-width: 24px; height: 24px; border-radius: 50%;
+    background: var(--color-background-info); color: var(--color-text-info);
+    font-size: 12px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-body { font-size: 14px; line-height: 1.6; color: var(--color-text-primary); }
+  .step-body code { font-family: var(--font-mono); font-size: 12px; background: var(--color-background-secondary); padding: 1px 5px; border-radius: 4px; }
+  h3 { font-size: 15px; font-weight: 500; margin: 1rem 0 0.5rem; }
+  .ask-btn {
+    margin-top: 1.5rem; padding: 8px 16px; border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary); font-size: 13px; cursor: pointer;
+  }
+  .ask-btn:hover { background: var(--color-background-secondary); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(0,1fr)); gap: 8px; }
+  @media (max-width: 500px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+
+<h2 class="sr-only">Explicación interactiva del código mdf_extractor.py — navega por secciones usando los botones</h2>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="show('overview')">Visión general</button>
+  <button class="nav-btn" onclick="show('imports')">Importaciones</button>
+  <button class="nav-btn" onclick="show('constants')">Constantes MDF</button>
+  <button class="nav-btn" onclick="show('readers')">Lectores de archivo</button>
+  <button class="nav-btn" onclick="show('detect')">Detector de formato</button>
+  <button class="nav-btn" onclick="show('parser_mdf')">Parser MDF etiquetado</button>
+  <button class="nav-btn" onclick="show('parser_raw')">Parser texto plano</button>
+  <button class="nav-btn" onclick="show('serializers')">Serializadores</button>
+  <button class="nav-btn" onclick="show('cli')">Interfaz CLI</button>
+  <button class="nav-btn" onclick="show('uso')">Cómo usarlo</button>
+</div>
+
+<div id="overview" class="section visible">
+  <div class="card">
+    <div class="card-title">¿Qué hace este programa?</div>
+    <div class="card-body">
+      El script recibe un archivo de diccionario (<code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">.txt</code>, <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">.docx</code> o <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">.pdf</code>), extrae automáticamente cada entrada léxica y la convierte a un formato estructurado (JSON, YAML o MDF).
+    </div>
+  </div>
+
+  <h3>Flujo principal del programa</h3>
+  <div class="card" style="padding: 0.5rem 1.25rem;">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body"><strong style="font-weight:500">Leer el archivo</strong> — según su extensión usa <code>read_txt</code>, <code>read_docx</code> o <code>read_pdf</code> para extraer el texto crudo.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body"><strong style="font-weight:500">Detectar el formato</strong> — <code>detect_format()</code> decide si el texto ya tiene etiquetas <code>\tag</code> o es texto plano sin estructura.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body"><strong style="font-weight:500">Parsear las entradas</strong> — usa <code>parse_mdf_tagged()</code> si ya tiene etiquetas, o <code>parse_raw_dictionary()</code> si es texto libre.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body"><strong style="font-weight:500">Serializar la salida</strong> — convierte las entradas al formato solicitado: <code>to_json()</code>, <code>to_yaml()</code> o <code>to_mdf_text()</code>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body"><strong style="font-weight:500">Escribir resultado</strong> — imprime en pantalla o guarda en un archivo, según lo que el usuario haya especificado.</div>
+    </div>
+  </div>
+
+</div>
+
+<div id="imports" class="section">
+  <div class="card">
+    <div class="card-title">Bloque de importaciones</div>
+    <div class="card-body">
+      Las bibliotecas se importan dentro de bloques <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">try/except</code> para que el programa funcione incluso si alguna no está instalada. Si falta una, la variable <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">*_AVAILABLE</code> queda en <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">False</code> y el error se lanza solo cuando se necesita esa funcionalidad.
+    </div>
+  </div>
+  <pre>import re, sys, json, argparse
+from pathlib import Path
+
+try:
+    import yaml          # pip install pyyaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+
+try:
+    import docx          # pip install python-docx
+    DOCX_AVAILABLE = True
+except ImportError:
+    DOCX_AVAILABLE = False
+
+try:
+    import fitz          # pip install PyMuPDF
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False</pre>
+  <div class="card" style="margin-top:1rem">
+    <div class="card-title">Bibliotecas estándar (siempre disponibles)</div>
+    <div class="card-body">
+      <span class="tag tag-gray">re</span> expresiones regulares para detectar patrones en el texto
+      <span class="tag tag-gray">json</span> serialización a formato JSON
+      <span class="tag tag-gray">sys</span> acceso a argumentos y stderr
+      <span class="tag tag-gray">argparse</span> interfaz de línea de comandos
+      <span class="tag tag-gray">pathlib.Path</span> manejo de rutas de archivo
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Bibliotecas opcionales (instalar con pip)</div>
+    <div class="card-body">
+      <span class="tag tag-blue">pyyaml</span> salida en formato YAML
+      <span class="tag tag-teal">python-docx</span> leer archivos Word .docx
+      <span class="tag tag-amber">PyMuPDF (fitz)</span> leer archivos PDF
+    </div>
+  </div>
+</div>
+
+<div id="constants" class="section">
+  <div class="card">
+    <div class="card-title">Constantes globales</div>
+    <div class="card-body">Definen la estructura que tendrá cada entrada del diccionario. Son la "columna vertebral" de todo el programa.</div>
+  </div>
+  <pre>MDF_FIELDS = [
+    "id", "lx", "ps", "sn", "se", "ph", "mr",
+    "de", "dn", "ge", "gn",
+    "xv", "xe", "xn", "rf",
+    "cf", "lf", "lv", "wv", "vd",
+    "nt", "et", "sc", "lo", "pc"
+]
+
+REPEATABLE = {"xv", "xe", "xn", "rf"}</pre>
+  <div class="card">
+    <div class="card-title">¿Por qué REPEATABLE?</div>
+    <div class="card-body">
+      Los campos <span class="tag tag-purple">xv</span> <span class="tag tag-purple">xe</span> <span class="tag tag-purple">xn</span> <span class="tag tag-purple">rf</span> pueden aparecer múltiples veces en una misma entrada (varios ejemplos, varias fuentes). Por eso se almacenan como <strong style="font-weight:500">listas</strong> en lugar de cadenas de texto. Todos los demás campos son cadenas simples.
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">new_entry() — función auxiliar</div>
+    <div class="card-body">Crea un diccionario vacío con todos los campos MDF. Los campos repetibles inician como lista <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">[]</code>, los demás como cadena vacía <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">""</code>.</div>
+  </div>
+  <pre>def new_entry():
+    return {f: ([] if f in REPEATABLE else "") 
+            for f in MDF_FIELDS}</pre>
+</div>
+
+<div id="readers" class="section">
+  <div class="card">
+    <div class="card-title">Tres funciones de lectura</div>
+    <div class="card-body">Cada función recibe una ruta de archivo y devuelve el contenido como texto plano. La función principal <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">extract()</code> elige cuál llamar según la extensión.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">read_txt(fp)</div>
+    <div class="fn-desc">La más simple. Abre el archivo con UTF-8 y lo lee completo. El parámetro <code style="font-family:var(--font-mono);font-size:12px">errors='replace'</code> evita que el programa falle con caracteres inusuales.</div>
+  </div>
+  <pre>def read_txt(fp):
+    with open(fp, 'r', encoding='utf-8', errors='replace') as f:
+        return f.read()</pre>
+  <div class="fn-card">
+    <div class="fn-name">read_docx(fp)</div>
+    <div class="fn-desc">Usa <code style="font-family:var(--font-mono);font-size:12px">python-docx</code> para extraer texto de párrafos y celdas de tablas. Verifica primero que la biblioteca esté disponible.</div>
+  </div>
+  <pre>def read_docx(fp):
+    if not DOCX_AVAILABLE:
+        raise ImportError("Instala: pip install python-docx")
+    doc = docx.Document(fp)
+    parts = [p.text for p in doc.paragraphs]
+    for tbl in doc.tables:       # también extrae tablas
+        for row in tbl.rows:
+            for cell in row.cells:
+                parts.append(cell.text)
+    return "\n".join(parts)</pre>
+  <div class="fn-card">
+    <div class="fn-name">read_pdf(fp)</div>
+    <div class="fn-desc">Usa <code style="font-family:var(--font-mono);font-size:12px">PyMuPDF (fitz)</code> para abrir el PDF, extrae el texto de cada página y cierra el documento.</div>
+  </div>
+  <pre>def read_pdf(fp):
+    if not PDF_AVAILABLE:
+        raise ImportError("Instala: pip install PyMuPDF")
+    doc = fitz.open(fp)
+    text = "".join(page.get_text() for page in doc)
+    doc.close()
+    return text</pre>
+</div>
+
+<div id="detect" class="section">
+  <div class="card">
+    <div class="card-title">detect_format(text)</div>
+    <div class="card-body">Analiza el texto para decidir qué parser usar. Busca con expresión regular cuántas etiquetas MDF comunes aparecen en el texto. Si hay 3 o más, asume que ya está etiquetado.</div>
+  </div>
+  <pre>def detect_format(text):
+    hits = len(re.findall(
+        r'^\\(lx|ps|de|dn|xv|sn)\b', 
+        text, 
+        re.MULTILINE
+    ))
+    return "mdf_tagged" if hits >= 3 else "raw"</pre>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Texto MDF etiquetado</div>
+      <div class="card-body" style="font-size:13px">Contiene líneas como <code style="font-family:var(--font-mono);font-size:11px;background:var(--color-background-secondary);padding:1px 4px;border-radius:3px">\lx ba</code>, <code style="font-family:var(--font-mono);font-size:11px;background:var(--color-background-secondary);padding:1px 4px;border-radius:3px">\ps n</code>, <code style="font-family:var(--font-mono);font-size:11px;background:var(--color-background-secondary);padding:1px 4px;border-radius:3px">\de egg.</code> → se usa <strong style="font-weight:500">parse_mdf_tagged</strong></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Texto plano / sin etiquetas</div>
+      <div class="card-body" style="font-size:13px">Bloques separados por líneas en blanco, sin marcadores → se usa <strong style="font-weight:500">parse_raw_dictionary</strong></div>
+    </div>
+  </div>
+</div>
+
+<div id="parser_mdf" class="section">
+  <div class="card">
+    <div class="card-title">parse_mdf_tagged(text) — el parser principal</div>
+    <div class="card-body">Recorre el texto línea por línea. Cuando encuentra <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">\lx</code> abre una nueva entrada. Cuando encuentra otra etiqueta <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">\tag valor</code> la asigna al campo correspondiente.</div>
+  </div>
+  <pre>for raw in text.splitlines():
+    line = raw.rstrip()
+    m = re.match(r'^\\(\w+)\s*(.*)', line)
+    
+    if m:
+        tag, value = m.group(1).lower(), m.group(2).strip()
+
+        if tag == "id":
+            pending_id = value   # guarda el \id para asignarlo al \lx siguiente
+            continue
+
+        if tag == "lx":
+            if current is not None:
+                entries.append(current)  # guarda entrada anterior
+            current = new_entry()
+            current["lx"] = value
+            if pending_id is not None:
+                current["id"] = pending_id
+                pending_id = None
+            continue
+
+        if tag in REPEATABLE:
+            current[tag].append(value)   # agrega a lista
+        elif tag in MDF_FIELDS:
+            current[tag] = value         # asigna cadena</pre>
+  <div class="card">
+    <div class="card-title">Detalle importante: pending_id</div>
+    <div class="card-body">En los diccionarios, <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">\id</code> aparece <em>antes</em> que <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">\lx</code>. La variable <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">pending_id</code> "recuerda" el ID hasta que aparece el lexema y lo puede asignar correctamente.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Líneas de continuación</div>
+    <div class="card-body">Si una línea no empieza con <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">\tag</code> pero tampoco está vacía, se considera continuación del campo anterior y se concatena con un espacio.</div>
+  </div>
+  <button class="ask-btn" onclick="sendPrompt('¿Cómo funciona exactamente el manejo de pending_id en el parser MDF?')">Explicar pending_id ↗</button>
+</div>
+
+<div id="parser_raw" class="section">
+  <div class="card">
+    <div class="card-title">parse_raw_dictionary(text) — parser heurístico</div>
+    <div class="card-body">Para diccionarios sin etiquetado. Divide el texto en bloques separados por líneas en blanco. Cada bloque es una posible entrada léxica.</div>
+  </div>
+  <div class="card" style="padding: 0.5rem 1.25rem;">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">La <strong style="font-weight:500">primera línea</strong> de cada bloque se toma como el lexema (<code>\lx</code>).</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">Si la <strong style="font-weight:500">segunda línea</strong> coincide con el patrón de parte del discurso (<code>n.</code>, <code>v.</code>, <code>adj.</code>, etc.), se asigna a <code>\ps</code>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">Las líneas que coinciden con <code>[\texto]</code> se asignan a <code>\ph</code> (transcripción fonética).</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">Las líneas cortas con palabras en español (<em>el, la, un, de, que</em>) se asignan a <code>\dn</code>. Las demás a <code>\de</code>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">Las líneas largas (más de 30 caracteres) se clasifican como ejemplos (<code>\xn</code> o <code>\xe</code>) según el idioma detectado.</div>
+    </div>
+  </div>
+  <pre>POS_RE = re.compile(
+    r'^[\[\(]?(s\.|st\.|n\.|v\.?\d?|vt\.|vi\.|vp\.|'
+    r'adj\.|adv\.|cont\.|prep\.|conj\.|pron\.?)[\]\)]?$',
+    re.IGNORECASE
+)</pre>
+  <div class="card">
+    <div class="card-title">Limitación del parser heurístico</div>
+    <div class="card-body">Al ser heurístico, puede cometer errores con texto poco estructurado. Para mejores resultados, se recomienda que los diccionarios ya tengan etiquetado MDF parcial, o que el texto tenga una estructura consistente.</div>
+  </div>
+  <button class="ask-btn" onclick="sendPrompt('¿Cómo puedo mejorar la detección heurística del parser para texto plano?')">Mejorar el parser heurístico ↗</button>
+</div>
+
+<div id="serializers" class="section">
+  <div class="card">
+    <div class="card-title">Tres funciones de serialización</div>
+    <div class="card-body">Convierten la lista de entradas (Python dicts) al formato de salida pedido. Primero pasan por <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">entries_to_dicts()</code> que garantiza que todos los campos estén presentes y con el tipo correcto.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">entries_to_dicts(entries)</div>
+    <div class="fn-desc">Normaliza cada entrada: recorre los campos en el orden definido por <code style="font-family:var(--font-mono);font-size:12px">MDF_FIELDS</code>, asegurándose que los campos repetibles sean listas y los demás cadenas de texto. Nunca produce <code style="font-family:var(--font-mono);font-size:12px">None</code>.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">to_json(entries, indent=2)</div>
+    <div class="fn-desc">Usa <code style="font-family:var(--font-mono);font-size:12px">json.dumps()</code> con <code style="font-family:var(--font-mono);font-size:12px">ensure_ascii=False</code> para preservar caracteres Unicode (tildes, caracteres IPA, etc.).</div>
+  </div>
+  <pre>def to_json(entries, indent=2):
+    return json.dumps(entries_to_dicts(entries), 
+                      ensure_ascii=False, 
+                      indent=indent)</pre>
+  <div class="fn-card">
+    <div class="fn-name">to_yaml(entries)</div>
+    <div class="fn-desc">Usa <code style="font-family:var(--font-mono);font-size:12px">yaml.dump()</code> con <code style="font-family:var(--font-mono);font-size:12px">allow_unicode=True</code> y <code style="font-family:var(--font-mono);font-size:12px">sort_keys=False</code> para mantener el orden de los campos MDF.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">to_mdf_text(entries)</div>
+    <div class="fn-desc">Produce la salida en formato <code style="font-family:var(--font-mono);font-size:12px">\tag valor</code>. Los campos repetibles generan múltiples líneas. Los campos vacíos producen <code style="font-family:var(--font-mono);font-size:12px">\tag </code> (con espacio) para mantener la estructura MDF completa.</div>
+  </div>
+</div>
+
+<div id="cli" class="section">
+  <div class="card">
+    <div class="card-title">Interfaz de línea de comandos (main)</div>
+    <div class="card-body">Usa <code style="font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px">argparse</code> para definir los argumentos que el usuario puede pasar al ejecutar el script.</div>
+  </div>
+  <pre>parser.add_argument("input",          # argumento obligatorio
+    help="Archivo de entrada (.txt, .docx, .pdf)")
+
+parser.add_argument("--format", "-f", # opcional
+    choices=["yaml", "json", "mdf"],
+    default="json")
+
+parser.add_argument("--output", "-o", # opcional
+    help="Archivo de salida (por defecto: stdout)")
+
+parser.add_argument("--indent",       # opcional
+    type=int, default=2)</pre>
+  <div class="card" style="padding: 0.5rem 1.25rem;">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">Verifica que el archivo exista con <code>Path(args.input).exists()</code>. Si no, imprime error y sale con código 1.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">Llama a <code>extract(args.input)</code> que internamente lee el archivo y parsea las entradas.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">Llama al serializador correcto según <code>--format</code>.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">Si se especificó <code>--output</code>, escribe el resultado en ese archivo. Si no, lo imprime en pantalla (stdout).</div>
+    </div>
+  </div>
+</div>
+
+<div id="uso" class="section">
+  <div class="card">
+    <div class="card-title">Instalación de dependencias</div>
+    <div class="card-body"></div>
+  </div>
+  <pre>pip install pyyaml python-docx PyMuPDF</pre>
+  <h3>Comandos de uso</h3>
+  <div class="fn-card">
+    <div class="fn-name">Caso 1 — Archivo .txt a JSON (imprimir en pantalla)</div>
+    <pre style="margin-top:6px">python mdf_extractor.py diccionario.txt</pre>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">Caso 2 — Archivo .txt a JSON, guardar archivo</div>
+    <pre style="margin-top:6px">python mdf_extractor.py diccionario.txt -f json -o salida.json</pre>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">Caso 3 — Archivo .pdf a YAML</div>
+    <pre style="margin-top:6px">python mdf_extractor.py diccionario.pdf -f yaml -o salida.yaml</pre>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">Caso 4 — Archivo .docx a formato MDF etiquetado</div>
+    <pre style="margin-top:6px">python mdf_extractor.py diccionario.docx -f mdf -o salida.mdf</pre>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <div class="card-title">Ver ayuda completa</div>
+    <div class="card-body"></div>
+  </div>
+  <pre>python mdf_extractor.py --help</pre>
+  <button class="ask-btn" onclick="sendPrompt('¿Cómo puedo adaptar el extractor MDF para procesar un diccionario con una estructura diferente?')">¿Cómo adaptarlo a otro formato? ↗</button>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  event.target.classList.add('active');
+}
+</script>
