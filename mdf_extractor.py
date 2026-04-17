@@ -34,6 +34,7 @@ try:
 except ImportError:
     PDF_AVAILABLE = False
 
+#Campos estándar de MDF, con algunos repetibles (listas)
 
 MDF_FIELDS = [
     "id", "lx", "ps", "sn", "se", "ph", "mr",
@@ -42,6 +43,7 @@ MDF_FIELDS = [
     "cf", "lf", "lv", "wv", "vd",
     "nt", "et", "sc", "lo", "pc"
 ]
+#Campos que pueden aparecer varias veces por entrada (listas)
 REPEATABLE = {"xv", "xe", "xn", "rf"}
 
 
@@ -51,7 +53,7 @@ def read_txt(fp):
 
 def read_docx(fp):
     if not DOCX_AVAILABLE:
-        raise ImportError("Install python-docx: pip install python-docx")
+        raise ImportError("Es necesario que instales python-docx")
     doc = docx.Document(fp)
     parts = [p.text for p in doc.paragraphs]
     for tbl in doc.tables:
@@ -62,7 +64,7 @@ def read_docx(fp):
 
 def read_pdf(fp):
     if not PDF_AVAILABLE:
-        raise ImportError("Install PyMuPDF: pip install PyMuPDF")
+        raise ImportError("Es necesario que instales PyMuPDF")
     doc = fitz.open(fp)
     text = "".join(page.get_text() for page in doc)
     doc.close()
@@ -197,7 +199,7 @@ def extract(filepath):
     elif ext == ".pdf":
         text = read_pdf(filepath)
     else:
-        raise ValueError(f"Unsupported format '{ext}'. Use .txt, .docx, or .pdf")
+        raise ValueError(f"Formato no soportado. Use .txt, .docx, or .pdf")
     fmt = detect_format(text)
     return parse_mdf_tagged(text) if fmt == "mdf_tagged" else parse_raw_dictionary(text)
 
@@ -217,7 +219,7 @@ def to_json(entries, indent=2):
 
 def to_yaml(entries):
     if not YAML_AVAILABLE:
-        raise ImportError("Install PyYAML: pip install pyyaml")
+        raise ImportError("Es necesario que instales PyYAML: pip install pyyaml")
     return yaml.dump(entries_to_dicts(entries), allow_unicode=True,
                      sort_keys=False, default_flow_style=False)
 
@@ -266,7 +268,7 @@ Examples:
         sys.exit(1)
 
     if not entries:
-        print("Warning: No entries extracted.", file=sys.stderr)
+        print("Warning: Entradas no extraídas.", file=sys.stderr)
         sys.exit(0)
 
     try:
@@ -283,7 +285,7 @@ Examples:
     if args.output:
         with open(args.output, 'w', encoding='utf-8') as f:
             f.write(output)
-        print(f"✓ {len(entries)} entries saved to: {args.output}")
+        print(f"✓ {len(entries)} entradas guardadas en: {args.output}")
     else:
         print(output)
 
